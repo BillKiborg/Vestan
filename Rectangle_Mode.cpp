@@ -1,18 +1,21 @@
 #include "Rectangle_Mode.h"
 
-void Rectangle_Mode::drawing(QMouseEvent* pE, QGraphicsScene* scene) {
+void Rectangle_Mode::drawing(QInputEvent* _p_event, QGraphicsScene* scene) {
 	
-	if (pE->type() == QMouseEvent::MouseButtonPress && pE->button() == Qt::LeftButton) {
+	auto p_event = dynamic_cast<QMouseEvent*>(_p_event);
+	if (!p_event) return;
 
-		pos_mouse_press = view->mapToScene(pE->pos());
+	if (p_event->type() == QMouseEvent::MouseButtonPress && p_event->button() == Qt::LeftButton) {
+
+		pos_mouse_press = view->mapToScene(p_event->pos());
 
 	}
-	else if (pE->type() == QMouseEvent::MouseMove) {
+	else if (p_event->type() == QMouseEvent::MouseMove && p_event->buttons() & Qt::LeftButton) {
 
-		qreal x = qMin(pos_mouse_press.x(), view->mapToScene(pE->pos()).x());
-		qreal y = qMin(pos_mouse_press.y(), view->mapToScene(pE->pos()).y());
-		qreal width = qAbs(view->mapToScene(pE->pos()).x() - pos_mouse_press.x());
-		qreal height = qAbs(view->mapToScene(pE->pos()).y() - pos_mouse_press.y());
+		qreal x = qMin(pos_mouse_press.x(), view->mapToScene(p_event->pos()).x());
+		qreal y = qMin(pos_mouse_press.y(), view->mapToScene(p_event->pos()).y());
+		qreal width = qAbs(view->mapToScene(p_event->pos()).x() - pos_mouse_press.x());
+		qreal height = qAbs(view->mapToScene(p_event->pos()).y() - pos_mouse_press.y());
 
 		if (!rectangle){
 			rectangle = new QGraphicsRectItem(x, y, width, height);
@@ -25,7 +28,7 @@ void Rectangle_Mode::drawing(QMouseEvent* pE, QGraphicsScene* scene) {
 		}
 
 	}
-	else if (pE->type() == QMouseEvent::MouseButtonRelease) {
+	else if (p_event->type() == QMouseEvent::MouseButtonRelease) {
 
 		if (rectangle) {
 			rectangle = nullptr;

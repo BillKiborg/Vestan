@@ -6,7 +6,7 @@
 
 #include <QMouseEvent>
 
-#include "Move_Mode.h"
+#include "Modification_Mode.h"
 #include "Square_Mode.h"
 #include "Rectangle_Mode.h"
 #include "Triangle_Mode.h"
@@ -29,11 +29,13 @@ private:
 
 protected:
 
-	void mousePressEvent(QMouseEvent* pE) override;
-	void mouseMoveEvent(QMouseEvent* pE)  override;
-	void mouseReleaseEvent(QMouseEvent* pE) override;
+	void mousePressEvent(QMouseEvent* p_event)	 override;
+	void mouseMoveEvent(QMouseEvent* p_event)	 override;
+	void mouseReleaseEvent(QMouseEvent* p_event) override;
+	void keyPressEvent(QKeyEvent* p_event)		 override;
+	void keyReleaseEvent(QKeyEvent* p_event)	 override;
 
-	void resizeEvent(QResizeEvent* pE) override {
+	void resizeEvent(QResizeEvent* p_event) override {
 		//qDebug() << pE->size();
 	}
 

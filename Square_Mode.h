@@ -14,7 +14,7 @@ public:
 
 	}
 
-	void drawing(QMouseEvent* pE, QGraphicsScene* scene) override;
+	void drawing(QInputEvent* p_event, QGraphicsScene* scene) override;
 
 };
 

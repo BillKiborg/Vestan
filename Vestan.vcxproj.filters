@@ -35,7 +35,7 @@
     <ClCompile Include="Square_Mode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Move_Mode.cpp">
+    <ClCompile Include="Modification_Mode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Rectangle_Mode.cpp">
@@ -61,7 +61,7 @@
     <ClInclude Include="Square_Mode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Move_Mode.h">
+    <ClInclude Include="Modification_Mode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Rectangle_Mode.h">

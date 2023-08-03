@@ -1,12 +1,15 @@
 #include "Triangle_Mode.h"
 
-void Triangle_Mode::drawing(QMouseEvent* pE, QGraphicsScene* scene) {    
+void Triangle_Mode::drawing(QInputEvent* _p_event, QGraphicsScene* scene) {
 
-    if (pE->type() == QMouseEvent::MouseButtonPress && pE->button() == Qt::LeftButton) {
+    auto p_event = dynamic_cast<QMouseEvent*>(_p_event);
+    if (!p_event) return;
+
+    if (p_event->type() == QMouseEvent::MouseButtonPress && p_event->button() == Qt::LeftButton) {
 
         if (mode == point::p1) {
 
-            p1 = new QPointF{ view->mapToScene(pE->pos()) };
+            p1 = new QPointF{ view->mapToScene(p_event->pos()) };
             mode = point::p2;
 
             view->setMouseTracking(true);
@@ -18,7 +21,7 @@ void Triangle_Mode::drawing(QMouseEvent* pE, QGraphicsScene* scene) {
         }
         else if (mode == point::p2) {
 
-            p2 = new QPointF{ view->mapToScene(pE->pos()) };
+            p2 = new QPointF{ view->mapToScene(p_event->pos()) };
             mode = point::p3;
 
             side_2 = new QGraphicsLineItem;
@@ -27,7 +30,7 @@ void Triangle_Mode::drawing(QMouseEvent* pE, QGraphicsScene* scene) {
 
         }
         else if (mode == point::p3) {
-            p3 = new QPointF{ view->mapToScene(pE->pos()) };
+            p3 = new QPointF{ view->mapToScene(p_event->pos()) };
             
             mode = point::p1;
             view->setMouseTracking(false);
@@ -53,11 +56,11 @@ void Triangle_Mode::drawing(QMouseEvent* pE, QGraphicsScene* scene) {
         }        
 
     }
-    else if (pE->type() == QEvent::MouseMove) {
+    else if (p_event->type() == QEvent::MouseMove) {
 
         qDebug() << "move 1";
 
-        auto current_pos = view->mapToScene(pE->pos());
+        auto current_pos = view->mapToScene(p_event->pos());
 
         if (mode == point::p2) {
             side_1->setLine(QLineF{ p1->x(), p1->y(), current_pos.x(), current_pos.y() });

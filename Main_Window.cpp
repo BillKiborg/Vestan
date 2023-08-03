@@ -28,6 +28,7 @@ Main_Window::Main_Window() {
 		new_action, &QAction::triggered,
 		[this] {
 			tab_wgt->addTab(new Graphics_View{mode}, "Новый");
+			tab_wgt->setCurrentIndex(tab_wgt->count() - 1);
 		});	
 
 	QToolBar* toolbar = new QToolBar{ "Toolbar", this };

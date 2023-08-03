@@ -1,15 +1,18 @@
 #include "Circle_Mode.h"
 
-void Circle_Mode::drawing(QMouseEvent* pE, QGraphicsScene* scene) {
+void Circle_Mode::drawing(QInputEvent* _p_event, QGraphicsScene* scene) {
 
-    if (pE->type() == QMouseEvent::MouseButtonPress && pE->button() == Qt::LeftButton) {
+    auto p_event = dynamic_cast<QMouseEvent*>(_p_event);
+    if (!p_event) return;
 
-        pos_mouse_press = view->mapToScene(pE->pos());
+    if (p_event->type() == QMouseEvent::MouseButtonPress && p_event->button() == Qt::LeftButton) {
+
+        pos_mouse_press = view->mapToScene(p_event->pos());
 
     }
-    else if (pE->type() == QMouseEvent::MouseMove) {
+    else if (p_event->type() == QMouseEvent::MouseMove && p_event->buttons() & Qt::LeftButton) {
 
-        auto current_pos = view->mapToScene(pE->pos());
+        auto current_pos = view->mapToScene(p_event->pos());
         qreal radius = sqrtf(pow(pos_mouse_press.x() - current_pos.x(), 2)
                             + pow(pos_mouse_press.y() - current_pos.y(), 2));
 
@@ -26,7 +29,7 @@ void Circle_Mode::drawing(QMouseEvent* pE, QGraphicsScene* scene) {
         }
 
     }
-    else if (pE->type() == QMouseEvent::MouseButtonRelease) {
+    else if (p_event->type() == QMouseEvent::MouseButtonRelease) {
         circle = nullptr;
     }    
 

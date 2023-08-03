@@ -87,7 +87,7 @@
     <ClCompile Include="Graphics_View.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Main_Window.cpp" />
-    <ClCompile Include="Move_Mode.cpp" />
+    <ClCompile Include="Modification_Mode.cpp" />
     <ClCompile Include="Rectangle_Mode.cpp" />
     <ClCompile Include="Square_Mode.cpp" />
     <ClCompile Include="Triangle_Mode.cpp" />
@@ -97,7 +97,7 @@
     <ClInclude Include="Circle_Mode.h" />
     <ClInclude Include="Graphics_View.h" />
     <ClInclude Include="Main_Window.h" />
-    <ClInclude Include="Move_Mode.h" />
+    <ClInclude Include="Modification_Mode.h" />
     <ClInclude Include="Rectangle_Mode.h" />
     <ClInclude Include="Square_Mode.h" />
     <ClInclude Include="Triangle_Mode.h" />

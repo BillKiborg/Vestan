@@ -2,6 +2,7 @@
 #define APPLICATION_MODE_H
 
 #include <QMouseEvent>
+#include <QKeyEvent>
 #include <QGraphicsScene>
 
 class Graphics_View;
@@ -12,7 +13,7 @@ protected:
 
 public:
 
-	virtual void drawing(QMouseEvent*, QGraphicsScene*) = 0;
+	virtual void drawing(QInputEvent*, QGraphicsScene*) = 0;
 	virtual ~Application_Mode() = default;
 
 	Application_Mode(Graphics_View* view) : view{view} {}	
