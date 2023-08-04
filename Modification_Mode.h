@@ -18,10 +18,18 @@ private:
 		ShapeSelect,
 		Move,
 		Multiple_Selection,
+		Rotate,
 	};
 
 	bool cntr_flag = false;
 	int  mode = Default;
+
+	enum {
+		clockwise,
+		counter_clockwise,
+	};
+
+	bool direction = true;
 
 public:
 	Modification_Mode(Graphics_View* view)

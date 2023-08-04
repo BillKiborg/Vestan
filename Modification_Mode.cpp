@@ -1,6 +1,6 @@
 #include "Modification_Mode.h"
 
-void Modification_Mode::drawing(QInputEvent* _p_event, QGraphicsScene* scene) {
+void Modification_Mode::drawing(QInputEvent* _p_event, QGraphicsScene* scene) {	
 
 	if (auto key_event = dynamic_cast<QKeyEvent*>(_p_event); key_event) {
 				
@@ -15,6 +15,8 @@ void Modification_Mode::drawing(QInputEvent* _p_event, QGraphicsScene* scene) {
 
 	auto p_event = dynamic_cast<QMouseEvent*>(_p_event);
 	if (!p_event) return;
+
+	qDebug() << "current pos mouse: " << view->mapToScene(p_event->pos());
 
 	if (p_event->type() == QMouseEvent::MouseButtonPress && p_event->button() == Qt::LeftButton) {
 				
@@ -67,12 +69,45 @@ void Modification_Mode::drawing(QInputEvent* _p_event, QGraphicsScene* scene) {
 	}
 	else if (p_event->type() == QMouseEvent::MouseButtonPress && p_event->button() == Qt::RightButton) {
 		
+		qDebug() << "Rotate";
+		mode = Rotate;
+		pos_mouse_begin_move = pos_mouse_press = view->mapToScene(p_event->pos());		
+		
+	}
+	else if (p_event->type() == QMouseEvent::MouseMove && p_event->buttons() & Qt::RightButton) {
+
+		qDebug() << "Rotate move";
+		auto current_pos = view->mapToScene(p_event->pos());		
+
 		for (auto& shape : shapes) {
-			shape->setTransformOriginPoint(shape->boundingRect().center());
-			shape->setRotation(45);
+
+			QPointF center = shape->mapToScene(shape->boundingRect().center()); //вычислить центр для каждой фигуры			
+			QTransform t1{ 1, 0, 0, 1, -center.x(), -center.y() };			
+
+			auto pos_mouse_begin_move_T = pos_mouse_begin_move * t1;
+			auto current_pos_T = current_pos * t1;				
+
+			auto scalar_product
+				= pos_mouse_begin_move_T.x() * current_pos_T.x() + pos_mouse_begin_move_T.y() * current_pos_T.y();
+
+
+
+			auto module_A = sqrt(pow(pos_mouse_begin_move_T.x(), 2) + pow(pos_mouse_begin_move_T.y(), 2));
+			auto module_B = sqrt(pow(current_pos_T.x(), 2) + pow(current_pos_T.y(), 2));			
+
+			if (module_A * module_B != 0){
+
+				auto angle = acos(scalar_product / (module_A * module_B)) * 180 / M_PI;
+				auto cross_scalar_product
+					= pos_mouse_begin_move.x() * current_pos.y() - pos_mouse_begin_move.y() * current_pos.x();
+
+				shape->setTransformOriginPoint(shape->boundingRect().center());
+				shape->setRotation(shape->rotation() + angle);
+			}			
+			
 		}
 
-		qDebug() << "shapes size: " << shapes.size();
+		pos_mouse_begin_move = current_pos;
 
 	}
 	else if (p_event->type() == QMouseEvent::MouseMove && p_event->buttons() & Qt::LeftButton) {
@@ -85,13 +120,13 @@ void Modification_Mode::drawing(QInputEvent* _p_event, QGraphicsScene* scene) {
 				dx = current_pos.x() - pos_mouse_begin_move.x(),
 				dy = current_pos.y() - pos_mouse_begin_move.y();
 
-			for (auto& shape : shapes) {
-				shape->setPos(QPointF{ shape->scenePos().x() + dx, shape->scenePos().y() + dy });
+			for (auto& shape : shapes) {				
+				shape->moveBy(dx, dy);
 				shape->update();
 			}
 
 			pos_mouse_begin_move = current_pos;
-		}
+		}		
 		else if (mode == Default) {
 			
 			qDebug() << "Multiple_Selection";
