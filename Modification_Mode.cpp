@@ -80,33 +80,60 @@ void Modification_Mode::drawing(QInputEvent* _p_event, QGraphicsScene* scene) {
 		auto current_pos = view->mapToScene(p_event->pos());		
 
 		for (auto& shape : shapes) {
+			
+			if (auto triangle = dynamic_cast<QGraphicsPolygonItem*>(shape); triangle) {
 
-			QPointF center = shape->mapToScene(shape->boundingRect().center()); //вычислить центр для каждой фигуры			
-			QTransform t1{ 1, 0, 0, 1, -center.x(), -center.y() };			
+				auto points = triangle->mapToScene(triangle->polygon());
+				
+				QPointF center;
+				for (auto& point : points) {
+					center += point;
+				}
+				center /= points.size();	
 
-			auto pos_mouse_begin_move_T = pos_mouse_begin_move * t1;
-			auto current_pos_T = current_pos * t1;				
+				qDebug() << "geo center scene: " << center;
 
-			auto scalar_product
-				= pos_mouse_begin_move_T.x() * current_pos_T.x() + pos_mouse_begin_move_T.y() * current_pos_T.y();
+				QTransform t1{ 1, 0, 0, 1, -center.x(), -center.y() };
 
+				auto pos_mouse_begin_move_T = pos_mouse_begin_move * t1;
+				auto current_pos_T = current_pos * t1;
 
+				qDebug() << "current pos triangle: " << current_pos_T;
 
-			auto module_A = sqrt(pow(pos_mouse_begin_move_T.x(), 2) + pow(pos_mouse_begin_move_T.y(), 2));
-			auto module_B = sqrt(pow(current_pos_T.x(), 2) + pow(current_pos_T.y(), 2));			
+				auto angle_BOx = atan(current_pos_T.y() / current_pos_T.x()) * 180 / M_PI;
+				auto angle_AOx = atan(pos_mouse_begin_move_T.y() / pos_mouse_begin_move_T.x()) * 180 / M_PI;
+				auto angle = angle_BOx - angle_AOx;
 
-			if (module_A * module_B != 0){
+				/*points = triangle->polygon();
+				for (auto& point : points) {
+					center += point;
+				}
+				center /= points.size();*/
 
-				auto angle = acos(scalar_product / (module_A * module_B)) * 180 / M_PI;
-				auto cross_scalar_product
-					= pos_mouse_begin_move.x() * current_pos.y() - pos_mouse_begin_move.y() * current_pos.x();
+				qDebug() << "geo center triangle: " << center;
+
+				shape->setTransformOriginPoint(center);
+				shape->setRotation(shape->rotation() + angle);
+
+			}
+			else {
+
+				QPointF center = shape->mapToScene(shape->boundingRect().center());
+				QTransform t1{ 1, 0, 0, 1, -center.x(), -center.y() };
+
+				auto pos_mouse_begin_move_T = pos_mouse_begin_move * t1;
+				auto current_pos_T = current_pos * t1;
+
+				auto angle_BOx = atan(current_pos_T.y() / current_pos_T.x()) * 180 / M_PI;
+				auto angle_AOx = atan(pos_mouse_begin_move_T.y() / pos_mouse_begin_move_T.x()) * 180 / M_PI;
+				auto angle = angle_BOx - angle_AOx;
 
 				shape->setTransformOriginPoint(shape->boundingRect().center());
 				shape->setRotation(shape->rotation() + angle);
-			}			
-			
-		}
 
+			}			
+		}
+		
 		pos_mouse_begin_move = current_pos;
 
 	}

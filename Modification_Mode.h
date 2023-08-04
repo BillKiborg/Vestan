@@ -23,14 +23,7 @@ private:
 
 	bool cntr_flag = false;
 	int  mode = Default;
-
-	enum {
-		clockwise,
-		counter_clockwise,
-	};
-
-	bool direction = true;
-
+	
 public:
 	Modification_Mode(Graphics_View* view)
 		: Application_Mode{ view } {
