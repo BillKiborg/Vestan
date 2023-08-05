@@ -19,8 +19,13 @@ Graphics_View::Graphics_View(int mode, QWidget* parent) {
     auto openGL_wgt = new QOpenGLWidget;
 
     QSurfaceFormat format;	
-    format.setSamples(16); 
-    openGL_wgt->setFormat(format);    
+    format.setSamples(16);     
+    
+    format.setRenderableType(QSurfaceFormat::OpenGL); 
+    format.setProfile(QSurfaceFormat::CoreProfile); 
+    format.setVersion(3, 3); 
+
+    openGL_wgt->setFormat(format);
 
     setViewport(openGL_wgt);    
 }

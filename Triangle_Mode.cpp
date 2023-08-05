@@ -39,8 +39,7 @@ void Triangle_Mode::drawing(QInputEvent* _p_event, QGraphicsScene* scene) {
             trianglePolygon << *p1 << *p2 << *p3;            
 
             QGraphicsPolygonItem* triangleItem = new QGraphicsPolygonItem(trianglePolygon);
-            triangleItem->setBrush(Qt::green); 
-            triangleItem->setFlags(QGraphicsItem::ItemIsMovable);
+            triangleItem->setBrush(Qt::green);             
             scene->addItem(triangleItem);
 
             delete p1; p1 = nullptr;

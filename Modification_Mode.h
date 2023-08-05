@@ -16,13 +16,20 @@ private:
 	enum {
 		Default,
 		ShapeSelect,
-		Move,
+		//Move,
 		Multiple_Selection,
 		Rotate,
+		Clone,
+		MoveClone
 	};
 
 	bool cntr_flag = false;
 	int  mode = Default;
+
+	void move(QMouseEvent* p_event, QGraphicsScene* scene);
+	void rotate(QMouseEvent* p_event);
+	void selection();
+	void clone(QGraphicsScene* scene);
 	
 public:
 	Modification_Mode(Graphics_View* view)
