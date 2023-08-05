@@ -13,9 +13,6 @@ void Modification_Mode::move(QMouseEvent* p_event, QGraphicsScene* scene) {
 		for (auto& shape : shapes) {
 			shape->moveBy(dx, dy);
 			shape->update();
-
-			//qDebug() << "pos post move: " << shape->mapToScene(shape->boundingRect().center());
-
 		}
 
 		pos_mouse_begin_move = current_pos;
@@ -41,7 +38,7 @@ void Modification_Mode::move(QMouseEvent* p_event, QGraphicsScene* scene) {
 		}
 
 		QList<QGraphicsItem*> itemsInRect
-			= scene->items(rect_select->sceneBoundingRect(), Qt::IntersectsItemBoundingRect);
+			= scene->items(rect_select->sceneBoundingRect(), Qt::IntersectsItemShape);
 
 		if (!cntr_flag) {
 
@@ -161,8 +158,7 @@ void Modification_Mode::rotate(QMouseEvent* p_event) {
 }
 
 void Modification_Mode::clone(QGraphicsScene* scene) {
-
-	qDebug() << "clone";
+		
 	for (auto& shape : shapes) {	
 		
 		if (typeid(*shape).name() == typeid(QGraphicsRectItem).name()) {
@@ -218,8 +214,7 @@ void Modification_Mode::clone(QGraphicsScene* scene) {
 			for (auto& point : old_shape->mapToScene(old_shape->polygon())) {
 				center += point;
 			}
-			center /= old_shape->polygon().size();
-			qDebug() << "\n\ncenter old: " << center;
+			center /= old_shape->polygon().size();			
 
 			old_shape->setTransformOriginPoint(center);
 			old_shape->setRotation(old_shape->rotation() - rotation);
@@ -262,7 +257,7 @@ void Modification_Mode::drawing(QInputEvent* _p_event, QGraphicsScene* scene) {
 	auto p_event = dynamic_cast<QMouseEvent*>(_p_event);
 	if (!p_event) return;
 
-	qDebug() << "current pos mouse: " << view->mapToScene(p_event->pos());
+	//qDebug() << "current pos mouse: " << view->mapToScene(p_event->pos());
 
 	if (p_event->type() == QMouseEvent::MouseButtonPress && p_event->button() == Qt::LeftButton) {
 				
@@ -319,7 +314,7 @@ void Modification_Mode::drawing(QInputEvent* _p_event, QGraphicsScene* scene) {
 		pos_mouse_begin_move = pos_mouse_press = view->mapToScene(p_event->pos());
 		mode = Clone;
 
-		clone(scene);
+		/*clone(scene);*/
 
 	}
 	else if (p_event->type() == QMouseEvent::MouseButtonPress && p_event->button() == Qt::RightButton) {
@@ -415,12 +410,13 @@ void Modification_Mode::drawing(QInputEvent* _p_event, QGraphicsScene* scene) {
 
 		}
 
-		if (mode == MoveClone) {
+		if (mode == MoveClone || mode == Clone) {
 			for (auto& item : scene->items()) {
 				static_cast<QAbstractGraphicsShapeItem*>(item)->setPen(QPen{ Qt::black, 1 });
 				item->update();
 			}
 			shapes.clear();
+			qDebug() << "Default";
 			mode = Default;
 		}
 

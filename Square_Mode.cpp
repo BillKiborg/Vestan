@@ -30,7 +30,7 @@ void Square_Mode::drawing(QInputEvent* _p_event, QGraphicsScene* scene) {
 		
 		if (square)	{
 			//qDebug() << "square rect: " << square->rect();
-			qDebug() << "square pos: " << square->scenePos();
+			//qDebug() << "square pos: " << square->scenePos();
 			square = nullptr;			
 		}
 	}
