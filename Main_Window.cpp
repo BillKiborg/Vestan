@@ -31,6 +31,25 @@ Main_Window::Main_Window() {
 			tab_wgt->setCurrentIndex(tab_wgt->count() - 1);
 		});	
 
+	QObject::connect(
+		load_action, &QAction::triggered,
+		[this] {
+			load();
+		});
+
+	QObject::connect(
+		save_action, &QAction::triggered,
+		[this] {
+			qDebug() << "Save";
+		});
+
+	QObject::connect(
+		save_as_action, &QAction::triggered,
+		[this] {			
+			auto scene = static_cast<Graphics_View*>(tab_wgt->widget(tab_wgt->currentIndex()))->get_scene();
+			save_as(scene);
+		});
+
 	QToolBar* toolbar = new QToolBar{ "Toolbar", this };
 	addToolBar(toolbar);
 	
@@ -186,3 +205,186 @@ Main_Window::Main_Window() {
 
 	setMenuBar(menubar);
 }
+
+void Main_Window::save_as(QGraphicsScene* scene) {
+	
+	QString selected_path = QFileDialog::getSaveFileName(
+		this, "Folder", QDir::homePath() += "/Graphics_Saves"		
+	);
+
+	qDebug() << "save path: " << selected_path;
+	//-----------------------------------------------
+
+	size_t count_item = scene->items().count();
+	//qDebug() << "count item scene: " << count_item;
+	
+	QFile file{ selected_path };
+	if (file.open(QIODevice::WriteOnly)) {
+
+		QDataStream stream{ &file };
+		stream.setVersion(QDataStream::Qt_6_3);		
+				
+		stream << count_item;
+		for (size_t n = 0; n < count_item; n++) {
+
+			auto shape = scene->items().at(n);
+			if (auto rectangle = dynamic_cast<QGraphicsRectItem*>(shape); rectangle) {
+
+				stream << QString{typeid(*rectangle).name()};				
+
+				auto rotation = rectangle->rotation();
+				rectangle->setTransformOriginPoint(rectangle->boundingRect().center());
+				rectangle->setRotation(0);
+
+				stream << rectangle->rect();
+				stream << rectangle->mapToScene(0, 0);				
+				stream << rectangle->boundingRect().center();
+				stream << rotation;
+
+				rectangle->setRotation(rotation);							
+
+			}
+			else if (auto circle = dynamic_cast<QGraphicsEllipseItem*>(shape); circle) {
+
+				stream << QString{typeid(*circle).name()};
+
+				auto rotation = circle->rotation();
+				circle->setTransformOriginPoint(circle->boundingRect().center());
+				circle->setRotation(0);
+
+				stream << circle->rect();
+				stream << circle->mapToScene(0, 0);
+				stream << circle->boundingRect().center();
+				stream << rotation;				
+
+				circle->setRotation(rotation);
+
+			}
+			else if (auto triangle = dynamic_cast<QGraphicsPolygonItem*>(shape); triangle) {
+
+				stream << QString{typeid(*triangle).name()};
+
+				auto rotation = triangle->rotation();
+
+				QPointF center;
+				for (auto& point : triangle->mapToScene(triangle->polygon())) {
+					center += point;
+				}
+				center /= triangle->polygon().size();
+
+				triangle->setTransformOriginPoint(center);
+				triangle->setRotation(0);
+
+				stream << triangle->polygon();
+				stream << triangle->mapToScene(0, 0);
+				stream << center;
+				stream << rotation;
+
+				triangle->setTransformOriginPoint(triangle->mapFromScene(center));
+				triangle->setRotation(rotation);
+				
+			}
+
+		}
+		
+		if (stream.status() != QDataStream::Ok) {
+			qDebug() << "Fail Save";
+		}
+
+	}
+	file.close();
+
+}
+
+void Main_Window::load() {
+
+	qDebug() << "Load";
+		
+	auto view = new Graphics_View{ mode };
+	tab_wgt->addTab(view, "Новый");
+	tab_wgt->setCurrentIndex(tab_wgt->count() - 1);
+
+	QString selected_path = QFileDialog::getOpenFileName(
+		this, "Folder", QDir::homePath() += "/Graphics_Saves",
+		"Binary Files (*)"
+	);
+	
+	qDebug() << "load file: " << selected_path;
+	
+
+	QFile file{ selected_path };
+	if (file.open(QIODevice::ReadOnly)) {
+		QDataStream stream{ &file };
+		stream.setVersion(QDataStream::Qt_6_3);
+
+		size_t count_item; stream >> count_item;
+		qDebug() << "load count_item: " << count_item;
+
+		for (int n = 0; n < count_item; n++) {
+			
+			QString type_name;		stream >> type_name;
+
+			if (type_name == typeid(QGraphicsRectItem).name()) {
+
+				QRectF	rect;			stream >> rect;
+				QPointF pos_scene;		stream >> pos_scene;
+				QPointF	center;			stream >> center;
+				qreal	rotation;		stream >> rotation;
+
+				QGraphicsRectItem* load_rect = new QGraphicsRectItem;
+				load_rect->setBrush(Qt::green);
+				load_rect->setRect(rect);
+				load_rect->setPos(pos_scene);
+				load_rect->setTransformOriginPoint(center);
+				load_rect->setRotation(rotation);
+
+				view->get_scene()->addItem(load_rect);
+
+			}
+			else if (type_name == typeid(QGraphicsEllipseItem).name()) {
+
+				QRectF	rect;			stream >> rect;
+				QPointF pos_scene;		stream >> pos_scene;
+				QPointF	center;			stream >> center;
+				qreal	rotation;		stream >> rotation;
+
+				QGraphicsEllipseItem* load_circle = new QGraphicsEllipseItem;
+				load_circle->setBrush(Qt::green);
+				load_circle->setRect(rect);
+				load_circle->setPos(pos_scene);
+				load_circle->setTransformOriginPoint(center);
+				load_circle->setRotation(rotation);
+
+				view->get_scene()->addItem(load_circle);
+
+			}
+			else if (type_name == typeid(QGraphicsPolygonItem).name()) {
+
+				QPolygonF	polygon;		stream >> polygon;
+				QPointF		pos_scene;		stream >> pos_scene;
+				QPointF		center;			stream >> center;
+				qreal		rotation;		stream >> rotation;
+
+				QGraphicsPolygonItem* load_triangle = new QGraphicsPolygonItem;
+				load_triangle->setBrush(Qt::green);
+				load_triangle->setPolygon(polygon);
+				load_triangle->setPos(pos_scene);
+				load_triangle->setTransformOriginPoint(load_triangle->mapFromScene(center));
+				load_triangle->setRotation(rotation);
+
+				view->get_scene()->addItem(load_triangle);
+
+			}					
+
+		}
+		
+		if (stream.status() != QDataStream::Ok) {
+			qDebug() << "Fail Load";
+		}		
+
+	}
+
+	file.close();
+
+}
+

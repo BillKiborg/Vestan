@@ -226,7 +226,7 @@ void Modification_Mode::clone(QGraphicsScene* scene) {
 			center /= old_shape->polygon().size();			
 
 			old_shape->setTransformOriginPoint(center);
-			old_shape->setRotation(old_shape->rotation() - rotation);
+			old_shape->setRotation(0/*old_shape->rotation() - rotation*/);
 
 			auto new_shape = new QGraphicsPolygonItem;
 			new_shape->setBrush(old_shape->brush());
@@ -275,7 +275,7 @@ void Modification_Mode::drawing(QInputEvent* _p_event, QGraphicsScene* scene) {
 	auto p_event = dynamic_cast<QMouseEvent*>(_p_event);
 	if (!p_event) return;
 
-	//qDebug() << "current pos mouse: " << view->mapToScene(p_event->pos());
+	qDebug() << "current pos mouse: " << view->mapToScene(p_event->pos());
 
 	if (p_event->type() == QMouseEvent::MouseButtonPress && p_event->button() == Qt::LeftButton) {
 				

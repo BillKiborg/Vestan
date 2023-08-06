@@ -23,7 +23,7 @@ void Rectangle_Mode::drawing(QInputEvent* _p_event, QGraphicsScene* scene) {
 			scene->addItem(rectangle);
 		}
 		else {
-			rectangle->setRect(x, y, width, height);
+			rectangle->setRect(x, y, width, height);			
 			rectangle->update();
 		}
 

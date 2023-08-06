@@ -61,3 +61,7 @@ void Graphics_View::mousePressEvent(QMouseEvent* p_event) {
 void Graphics_View::set_mode(int mode) {
     this->mode = mode;
 }
+
+QGraphicsScene* Graphics_View::get_scene() {
+    return scene;
+}

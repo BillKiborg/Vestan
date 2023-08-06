@@ -10,9 +10,13 @@
 #include <QPushButton>
 #include <QResizeEvent>
 #include <QToolButton>
+#include <QFile>
+#include <QFileDialog>
 
 #include "Graphics_View.h"
 #include "Tool_Button.h"
+
+#include <fstream>
 
 class Main_Window : public QMainWindow{
 private:
@@ -29,5 +33,9 @@ protected:
 
 public:
 	Main_Window();
+	void save();
+	void save_as(QGraphicsScene* scene);
+	void load();
+
 };
 

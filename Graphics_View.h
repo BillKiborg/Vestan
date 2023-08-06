@@ -43,6 +43,7 @@ public:
 
 	Graphics_View(int mode, QWidget* parent = nullptr);
 	void set_mode(int mode);
+	QGraphicsScene* get_scene();
 
 };
 
