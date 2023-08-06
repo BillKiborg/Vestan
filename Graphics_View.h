@@ -30,7 +30,7 @@ private:
 protected:
 
 	void mousePressEvent(QMouseEvent* p_event)	 override;
-	void mouseMoveEvent(QMouseEvent* p_event)	 override;
+	void mouseMoveEvent(QMouseEvent* p_event)  noexcept	 override;
 	void mouseReleaseEvent(QMouseEvent* p_event) override;
 	void keyPressEvent(QKeyEvent* p_event)		 override;
 	void keyReleaseEvent(QKeyEvent* p_event)	 override;

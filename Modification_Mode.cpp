@@ -1,8 +1,10 @@
 #include "Modification_Mode.h"
 
-void Modification_Mode::move(QMouseEvent* p_event, QGraphicsScene* scene) {
+void Modification_Mode::move(QMouseEvent* p_event, QGraphicsScene* scene) noexcept {
 
 	if (mode == ShapeSelect || mode == Multiple_Selection || mode == MoveClone) {
+
+		auto t1 = std::chrono::system_clock::now();
 
 		auto current_pos = view->mapToScene(p_event->pos());
 
@@ -11,11 +13,18 @@ void Modification_Mode::move(QMouseEvent* p_event, QGraphicsScene* scene) {
 			dy = current_pos.y() - pos_mouse_begin_move.y();
 
 		for (auto& shape : shapes) {
-			shape->moveBy(dx, dy);
-			shape->update();
+			shape->moveBy(dx, dy);			
 		}
 
 		pos_mouse_begin_move = current_pos;
+
+		auto t2 = std::chrono::system_clock::now();
+
+		qDebug() << "count shapes: " << shapes.size();
+		qDebug() << "time move: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() / 1000.0 << "s";
+		qDebug() << "couef: " << shapes.size() / (std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count() / 1000000.0);
+		qDebug() << "--------------------------------------------------------";
+
 	}
 	else if (mode == Default) {
 
@@ -251,6 +260,15 @@ void Modification_Mode::drawing(QInputEvent* _p_event, QGraphicsScene* scene) {
 		else if (key_event->key() == Qt::Key_Control && key_event->type() == QEvent::KeyRelease) {			
 			cntr_flag = false;
 		}
+		else if (key_event->key() == Qt::Key_D && key_event->type() == QEvent::KeyPress) {
+			
+			for (auto& shape : shapes) {
+				scene->removeItem(shape);
+				delete shape;
+			}
+			shapes.clear();
+		}
+
 		return;
 	}
 

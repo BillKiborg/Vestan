@@ -42,8 +42,16 @@ void Graphics_View::mouseReleaseEvent(QMouseEvent* p_event) {
     modes[mode]->drawing(p_event, scene);
 }
 
-void Graphics_View::mouseMoveEvent(QMouseEvent* p_event) {
+void Graphics_View::mouseMoveEvent(QMouseEvent* p_event) noexcept {
+
+    auto t1 = std::chrono::system_clock::now();
     modes[mode]->drawing(p_event, scene);
+    auto t2 = std::chrono::system_clock::now();
+    qDebug() 
+        << "mouse move time: " 
+        << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() / 1000.0
+        << "s";
+
 }
 
 void Graphics_View::mousePressEvent(QMouseEvent* p_event) {

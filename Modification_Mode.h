@@ -26,7 +26,7 @@ private:
 	bool cntr_flag = false;
 	int  mode = Default;
 
-	void move(QMouseEvent* p_event, QGraphicsScene* scene);
+	void move(QMouseEvent* p_event, QGraphicsScene* scene) noexcept;
 	void rotate(QMouseEvent* p_event);
 	void selection();
 	void clone(QGraphicsScene* scene);
