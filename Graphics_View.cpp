@@ -65,3 +65,7 @@ void Graphics_View::set_mode(int mode) {
 QGraphicsScene* Graphics_View::get_scene() {
     return scene;
 }
+
+QString& Graphics_View::get_name() {
+    return name;
+}

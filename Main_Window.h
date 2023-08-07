@@ -12,15 +12,17 @@
 #include <QToolButton>
 #include <QFile>
 #include <QFileDialog>
+#include <QCoreApplication>
 
 #include "Graphics_View.h"
 #include "Tool_Button.h"
+#include "Tab_Widget.h"
 
-#include <fstream>
+#include <QTabBar>
 
 class Main_Window : public QMainWindow{
 private:
-	QTabWidget* tab_wgt = nullptr;
+	Tab_Widget* tab_wgt = nullptr;
 	int mode;
 	Tool_Button* bt_mode = nullptr;
 
@@ -34,7 +36,7 @@ protected:
 public:
 	Main_Window();
 	void save();
-	void save_as(QGraphicsScene* scene);
+	QString save_as(QGraphicsScene* scene);
 	void load();
 
 };

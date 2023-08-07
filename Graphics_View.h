@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <QGraphicsScene>
 #include <QGraphicsView>
@@ -27,6 +27,8 @@ private:
 	QVector<Application_Mode*> modes;
 	int mode;
 
+	QString name = "Новый";
+
 protected:
 
 	void mousePressEvent(QMouseEvent* p_event)	 override;
@@ -44,6 +46,7 @@ public:
 	Graphics_View(int mode, QWidget* parent = nullptr);
 	void set_mode(int mode);
 	QGraphicsScene* get_scene();
+	QString& get_name();
 
 };
 

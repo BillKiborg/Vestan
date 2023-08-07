@@ -20,10 +20,22 @@ Main_Window::Main_Window() {
 	file_menu->addAction(save_as_action);
 	file_menu->addAction(exit_action);	
 
-	this->tab_wgt = new QTabWidget;
-	tab_wgt->addTab(new Graphics_View{ mode }, "Новый");
+	this->tab_wgt = new Tab_Widget;
+
+	auto test = new Graphics_View{ mode };
+	auto test_action = new QAction{ "Test", test };
+	test->addAction(test_action);
+
+	QObject::connect(
+		test_action, &QAction::triggered,
+		[] {
+			qDebug() << "Test";
+		}
+	);
+
+	tab_wgt->addTab(test, "Новый");
 	setCentralWidget(tab_wgt);
-	
+		
 	QObject::connect(
 		new_action, &QAction::triggered,
 		[this] {
@@ -41,6 +53,7 @@ Main_Window::Main_Window() {
 		save_action, &QAction::triggered,
 		[this] {
 			qDebug() << "Save";
+			save();
 		});
 
 	QObject::connect(
@@ -55,12 +68,24 @@ Main_Window::Main_Window() {
 	
 	//--------------------------------------------------------------------------------
 	auto bt_move = new Tool_Button;	
-	
-	bt_move->set_draw_function([bt = bt_move](bool activation) {				
-		if (activation)
-			bt->setIcon(QIcon{ "C:\\Users\\Bill\\Desktop\\VS_C++\\Vestan\\Resource\\Move_Focus.png" });
-		else
-			bt->setIcon(QIcon{ "C:\\Users\\Bill\\Desktop\\VS_C++\\Vestan\\Resource\\Move.png" });
+				
+	QDir  resource_path = QCoreApplication::applicationDirPath();	
+
+	while (true) {		
+		if (resource_path.dirName() == "Vestan") {			
+			resource_path = resource_path.filePath("Resource");
+			break;
+		}
+		resource_path.cdUp();
+	}	
+
+	bt_move->set_draw_function([bt = bt_move, resource_path](bool activation) {
+				
+		if (activation) 						
+			bt->setIcon(QIcon{ resource_path.filePath("Move_Focus.png") });					
+		else 			
+			bt->setIcon(QIcon{ resource_path.filePath("Move.png") });
+		
 		});		
 		
 	toolbar->addWidget(bt_move);
@@ -87,12 +112,12 @@ Main_Window::Main_Window() {
 
 	//-------------------------------------------------------------------------------------------
 	auto bt_square = new Tool_Button;	
-	bt_square->set_draw_function([bt = bt_square](bool activation) {
-
-		if (!activation)
-			bt->setIcon(QIcon{ "C:\\Users\\Bill\\Desktop\\VS_C++\\Vestan\\Resource\\Square.png" });
-		else
-			bt->setIcon(QIcon{ "C:\\Users\\Bill\\Desktop\\VS_C++\\Vestan\\Resource\\Square_Focus.png" });
+	bt_square->set_draw_function([bt = bt_square, resource_path](bool activation) {
+		
+		if (!activation) 		
+			bt->setIcon(QIcon{ resource_path.filePath("Square.png") });		
+		else 					
+			bt->setIcon(QIcon{ resource_path.filePath("Square_Focus.png") });		
 
 		});
 
@@ -118,12 +143,12 @@ Main_Window::Main_Window() {
 
 
 	auto bt_rectangle = new Tool_Button;
-	bt_rectangle->set_draw_function([bt = bt_rectangle](bool activation) {
+	bt_rectangle->set_draw_function([bt = bt_rectangle, resource_path](bool activation) {
 
-		if (!activation) 
-			bt->setIcon(QIcon{ "C:\\Users\\Bill\\Desktop\\VS_C++\\Vestan\\Resource\\Rectangle.png" });
+		if (!activation) 			
+			bt->setIcon(QIcon{ resource_path.filePath("Rectangle.png") });		
 		else
-			bt->setIcon(QIcon{ "C:\\Users\\Bill\\Desktop\\VS_C++\\Vestan\\Resource\\Rectangle_Focus.png" });		
+			bt->setIcon(QIcon{ resource_path.filePath("Rectangle_Focus.png") });
 
 		});
 
@@ -148,11 +173,11 @@ Main_Window::Main_Window() {
 
 
 	auto bt_triangle = new Tool_Button;
-	bt_triangle->set_draw_function([bt = bt_triangle](bool activation) {
+	bt_triangle->set_draw_function([bt = bt_triangle, resource_path](bool activation) {
 		if (activation)
-			bt->setIcon(QIcon{ "C:\\Users\\Bill\\Desktop\\VS_C++\\Vestan\\Resource\\Triangle_Focus.png" });
+			bt->setIcon(QIcon{ resource_path.filePath("Triangle_Focus.png") });			
 		else
-			bt->setIcon(QIcon{ "C:\\Users\\Bill\\Desktop\\VS_C++\\Vestan\\Resource\\Triangle.png" });
+			bt->setIcon(QIcon{ resource_path.filePath("Triangle.png") });			
 		});
 	
 	toolbar->addWidget(bt_triangle);
@@ -176,12 +201,12 @@ Main_Window::Main_Window() {
 
 
 	auto bt_circle = new Tool_Button;
-	bt_circle->set_draw_function([bt = bt_circle](bool activation) {
+	bt_circle->set_draw_function([bt = bt_circle, resource_path](bool activation) {
 
 		if (!activation) 
-			bt->setIcon(QIcon{ "C:\\Users\\Bill\\Desktop\\VS_C++\\Vestan\\Resource\\Circle.png" });
+			bt->setIcon(QIcon{ resource_path.filePath("Circle.png") });			
 		else
-			bt->setIcon(QIcon{ "C:\\Users\\Bill\\Desktop\\VS_C++\\Vestan\\Resource\\Circle_Focus.png" });
+			bt->setIcon(QIcon{ resource_path.filePath("Circle_Focus.png") });			
 
 		});
 
@@ -206,13 +231,108 @@ Main_Window::Main_Window() {
 	setMenuBar(menubar);
 }
 
-void Main_Window::save_as(QGraphicsScene* scene) {
+
+void Main_Window::save() {
+
+	auto view = static_cast<Graphics_View*>(tab_wgt->currentWidget());
+
+	if (view->get_name() == "Новый") {		
+		view->get_name() = save_as(view->get_scene());
+		tab_wgt->setTabText(tab_wgt->currentIndex(), QDir{ view->get_name() }.dirName());
+	}
+	else {
+
+		size_t count_item = view->get_scene()->items().count();
+		//qDebug() << "count item scene: " << count_item;
+
+		QFile file{ view->get_name()};
+		if (file.open(QIODevice::WriteOnly)) {
+
+			QDataStream stream{ &file };
+			stream.setVersion(QDataStream::Qt_6_3);
+
+			stream << count_item;
+			for (size_t n = 0; n < count_item; n++) {
+
+				auto shape = view->get_scene()->items().at(n);
+				if (auto rectangle = dynamic_cast<QGraphicsRectItem*>(shape); rectangle) {
+
+					stream << QString{typeid(*rectangle).name()};
+
+					auto rotation = rectangle->rotation();
+					rectangle->setTransformOriginPoint(rectangle->boundingRect().center());
+					rectangle->setRotation(0);
+
+					stream << rectangle->rect();
+					stream << rectangle->mapToScene(0, 0);
+					stream << rectangle->boundingRect().center();
+					stream << rotation;
+
+					rectangle->setRotation(rotation);
+
+				}
+				else if (auto circle = dynamic_cast<QGraphicsEllipseItem*>(shape); circle) {
+
+					stream << QString{typeid(*circle).name()};
+
+					auto rotation = circle->rotation();
+					circle->setTransformOriginPoint(circle->boundingRect().center());
+					circle->setRotation(0);
+
+					stream << circle->rect();
+					stream << circle->mapToScene(0, 0);
+					stream << circle->boundingRect().center();
+					stream << rotation;
+
+					circle->setRotation(rotation);
+
+				}
+				else if (auto triangle = dynamic_cast<QGraphicsPolygonItem*>(shape); triangle) {
+
+					stream << QString{typeid(*triangle).name()};
+
+					auto rotation = triangle->rotation();
+
+					QPointF center;
+					for (auto& point : triangle->mapToScene(triangle->polygon())) {
+						center += point;
+					}
+					center /= triangle->polygon().size();
+
+					triangle->setTransformOriginPoint(center);
+					triangle->setRotation(0);
+
+					stream << triangle->polygon();
+					stream << triangle->mapToScene(0, 0);
+					stream << center;
+					stream << rotation;
+
+					triangle->setTransformOriginPoint(triangle->mapFromScene(center));
+					triangle->setRotation(rotation);
+
+				}
+
+			}
+
+			if (stream.status() != QDataStream::Ok) {
+				qDebug() << "Fail Save";
+			}
+
+		}
+		file.close();
+
+	}
+
+}
+
+
+QString Main_Window::save_as(QGraphicsScene* scene) {
 	
 	QString selected_path = QFileDialog::getSaveFileName(
 		this, "Folder", QDir::homePath() += "/Graphics_Saves"		
 	);
 
-	qDebug() << "save path: " << selected_path;
+	//qDebug() << "save path: " << selected_path;
 	//-----------------------------------------------
 
 	size_t count_item = scene->items().count();
@@ -293,24 +413,26 @@ void Main_Window::save_as(QGraphicsScene* scene) {
 
 	}
 	file.close();
+	return selected_path;
 
 }
 
 void Main_Window::load() {
 
-	qDebug() << "Load";
+	//qDebug() << "Load";
 		
-	auto view = new Graphics_View{ mode };
-	tab_wgt->addTab(view, "Новый");
-	tab_wgt->setCurrentIndex(tab_wgt->count() - 1);
+	auto view = new Graphics_View{ mode };	
 
 	QString selected_path = QFileDialog::getOpenFileName(
 		this, "Folder", QDir::homePath() += "/Graphics_Saves",
 		"Binary Files (*)"
 	);
 	
-	qDebug() << "load file: " << selected_path;
-	
+	//qDebug() << "load file: " << selected_path;
+	view->get_name() = selected_path;
+
+	tab_wgt->addTab(view, QDir{ selected_path }.dirName());
+	tab_wgt->setCurrentIndex(tab_wgt->count() - 1);
 
 	QFile file{ selected_path };
 	if (file.open(QIODevice::ReadOnly)) {
@@ -318,7 +440,7 @@ void Main_Window::load() {
 		stream.setVersion(QDataStream::Qt_6_3);
 
 		size_t count_item; stream >> count_item;
-		qDebug() << "load count_item: " << count_item;
+		//qDebug() << "load count_item: " << count_item;
 
 		for (int n = 0; n < count_item; n++) {
 			
