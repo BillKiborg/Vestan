@@ -253,15 +253,16 @@ void Modification_Mode::clone(QGraphicsScene* scene) {
 void Modification_Mode::drawing(QInputEvent* _p_event, QGraphicsScene* scene) {	
 
 	if (auto key_event = dynamic_cast<QKeyEvent*>(_p_event); key_event) {
-				
+		
+
 		if (key_event->key() == Qt::Key_Control && key_event->type() == QEvent::KeyPress) {			
 			cntr_flag = true;
 		}
 		else if (key_event->key() == Qt::Key_Control && key_event->type() == QEvent::KeyRelease) {			
 			cntr_flag = false;
 		}
-		else if (key_event->key() == Qt::Key_D && key_event->type() == QEvent::KeyPress) {
-			
+		else if ((key_event->key() == Qt::Key_D || key_event->key() == 1042) && key_event->type() == QEvent::KeyPress) {			
+
 			for (auto& shape : shapes) {
 				scene->removeItem(shape);
 				delete shape;

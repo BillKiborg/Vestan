@@ -13,6 +13,7 @@
 #include <QFile>
 #include <QFileDialog>
 #include <QCoreApplication>
+#include <QApplication>
 
 #include "Graphics_View.h"
 #include "Tool_Button.h"
@@ -28,6 +29,23 @@ private:
 
 	QVector<QToolButton*> btns;
 
+	QMenuBar  menubar;
+	QMenu*    file_menu = nullptr;
+
+	QAction* new_action		= nullptr;
+	QAction* load_action	= nullptr;
+	QAction* save_action	= nullptr;
+	QAction* save_as_action = nullptr;
+	QAction* exit_action	= nullptr;
+
+	QToolBar*	toolbar = nullptr;
+
+	Tool_Button* bt_move		= nullptr;
+	Tool_Button* bt_square		= nullptr;
+	Tool_Button* bt_triangle	= nullptr;
+	Tool_Button* bt_circle		= nullptr;
+
+
 protected:
 	void resizeEvent(QResizeEvent* pe) override {
 		//qDebug() << pe->size();
@@ -35,9 +53,11 @@ protected:
 
 public:
 	Main_Window();
+	~Main_Window();
+
 	void save();
 	QString save_as(QGraphicsScene* scene);
-	void load();
+	void load();	
 
 };
 

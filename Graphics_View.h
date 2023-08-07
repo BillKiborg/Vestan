@@ -23,6 +23,7 @@ namespace mode {
 class Graphics_View : public QGraphicsView{
 private:
 	QGraphicsScene*		scene = nullptr;
+	QOpenGLWidget* openGL_wgt = nullptr;
 	
 	QVector<Application_Mode*> modes;
 	int mode;
@@ -47,6 +48,8 @@ public:
 	void set_mode(int mode);
 	QGraphicsScene* get_scene();
 	QString& get_name();
+
+	~Graphics_View();
 
 };
 

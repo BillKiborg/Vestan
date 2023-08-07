@@ -16,7 +16,7 @@ Graphics_View::Graphics_View(int mode, QWidget* parent) {
 
     setRenderHint(QPainter::Antialiasing, true);
 
-    auto openGL_wgt = new QOpenGLWidget;
+    openGL_wgt = new QOpenGLWidget;
 
     QSurfaceFormat format;	
     format.setSamples(16);     
@@ -28,6 +28,20 @@ Graphics_View::Graphics_View(int mode, QWidget* parent) {
     openGL_wgt->setFormat(format);
 
     setViewport(openGL_wgt);    
+}
+
+Graphics_View::~Graphics_View() {
+
+    //qDebug() << "Graphics View Destroyed";
+
+    if (scene) delete scene;
+
+    if (openGL_wgt) delete openGL_wgt;
+
+    for (auto& mode : modes) {
+        if (mode) delete mode;
+    }
+
 }
 
 void Graphics_View::keyPressEvent(QKeyEvent* p_event) {

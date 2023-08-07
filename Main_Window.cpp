@@ -5,14 +5,14 @@ Main_Window::Main_Window() {
 	mode = mode::Move;
 	setMinimumSize(1028, 647);
 
-	QMenuBar* menubar = new QMenuBar{ this };
-	QMenu* file_menu  = menubar->addMenu("File");
+	menubar.setParent(this);
+	file_menu  = menubar.addMenu("File");
 
-	QAction* new_action		= new QAction{ "New", this };
-	QAction* load_action	= new QAction{ "Load", this };
-	QAction* save_action	= new QAction{ "Save", this };
-	QAction* save_as_action = new QAction{ "Save As", this };
-	QAction* exit_action	= new QAction{ "Exit", this };
+	new_action		= new QAction{ "New", this };
+	load_action		= new QAction{ "Load", this };
+	save_action		= new QAction{ "Save", this };
+	save_as_action	= new QAction{ "Save As", this };
+	exit_action		= new QAction{ "Exit", this };
 
 	file_menu->addAction(new_action);
 	file_menu->addAction(load_action);
@@ -21,19 +21,8 @@ Main_Window::Main_Window() {
 	file_menu->addAction(exit_action);	
 
 	this->tab_wgt = new Tab_Widget;
-
-	auto test = new Graphics_View{ mode };
-	auto test_action = new QAction{ "Test", test };
-	test->addAction(test_action);
-
-	QObject::connect(
-		test_action, &QAction::triggered,
-		[] {
-			qDebug() << "Test";
-		}
-	);
-
-	tab_wgt->addTab(test, "Новый");
+	
+	tab_wgt->addTab(new Graphics_View{ mode }, "Новый");
 	setCentralWidget(tab_wgt);
 		
 	QObject::connect(
@@ -61,13 +50,16 @@ Main_Window::Main_Window() {
 		[this] {			
 			auto scene = static_cast<Graphics_View*>(tab_wgt->widget(tab_wgt->currentIndex()))->get_scene();
 			save_as(scene);
-		});
+		});	
 
-	QToolBar* toolbar = new QToolBar{ "Toolbar", this };
+	QObject::connect(exit_action, &QAction::triggered,
+					QApplication::instance(), &QApplication::quit);
+
+	toolbar = new QToolBar{ "Toolbar", this };
 	addToolBar(toolbar);
 	
 	//--------------------------------------------------------------------------------
-	auto bt_move = new Tool_Button;	
+	bt_move = new Tool_Button;	
 				
 	QDir  resource_path = QCoreApplication::applicationDirPath();	
 
@@ -111,7 +103,7 @@ Main_Window::Main_Window() {
 	
 
 	//-------------------------------------------------------------------------------------------
-	auto bt_square = new Tool_Button;	
+	bt_square = new Tool_Button;	
 	bt_square->set_draw_function([bt = bt_square, resource_path](bool activation) {
 		
 		if (!activation) 		
@@ -172,7 +164,7 @@ Main_Window::Main_Window() {
 
 
 
-	auto bt_triangle = new Tool_Button;
+	bt_triangle = new Tool_Button;
 	bt_triangle->set_draw_function([bt = bt_triangle, resource_path](bool activation) {
 		if (activation)
 			bt->setIcon(QIcon{ resource_path.filePath("Triangle_Focus.png") });			
@@ -200,7 +192,7 @@ Main_Window::Main_Window() {
 	
 
 
-	auto bt_circle = new Tool_Button;
+	bt_circle = new Tool_Button;
 	bt_circle->set_draw_function([bt = bt_circle, resource_path](bool activation) {
 
 		if (!activation) 
@@ -228,9 +220,25 @@ Main_Window::Main_Window() {
 			}
 		});
 
-	setMenuBar(menubar);
+	setMenuBar(&menubar);
 }
 
+Main_Window::~Main_Window() {
+
+	//qDebug() << "Main Window Destroyed";
+
+	if (tab_wgt)	delete tab_wgt;
+	if (file_menu)	delete file_menu;
+
+	if (new_action)		delete new_action;
+	if (load_action)	delete load_action;
+	if (save_action)	delete save_action;
+	if (save_as_action) delete save_as_action;
+	if (exit_action)	delete exit_action;
+
+	if (toolbar)		delete toolbar;
+
+}
 
 void Main_Window::save() {
 
