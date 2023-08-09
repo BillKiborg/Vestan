@@ -6,6 +6,7 @@
 
 int main(int argc, char** argv) {
 	QApplication App{ argc, argv };	
+	//App.setStyle("Fusion");
 
 	Main_Window wnd;
 	wnd.show();    

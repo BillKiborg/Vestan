@@ -8,6 +8,8 @@ Main_Window::Main_Window() {
 	menubar.setParent(this);
 	file_menu  = menubar.addMenu("File");
 
+	
+
 	new_action		= new QAction{ "New", this };
 	load_action		= new QAction{ "Load", this };
 	save_action		= new QAction{ "Save", this };
